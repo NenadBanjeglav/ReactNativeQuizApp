@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, StyleSheet } from "react-native";
 import AnswerOption from "./AnswerOption";
 import Card from "./Card";
@@ -12,6 +12,8 @@ type QuestionCardProps = {
 };
 
 const QuestionCard = ({ question }: QuestionCardProps) => {
+  useEffect(() => {}, []);
+
   return (
     <Card title={question.title}>
       <View style={{ gap: 10 }}>

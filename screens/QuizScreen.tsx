@@ -1,36 +1,58 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SafeAreaView, StyleSheet, Text, View } from "react-native";
 import QuestionCard from "../components/QuestionCard";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import Card from "../components/Card";
 import CustomButton from "../components/CustomButton";
 import { useQuizContext } from "../providers/QuizProvider";
+import { useTimer } from "../hooks/timer";
 
 const QuizScreen = () => {
-  const { question, questionIndex, onNext, score, totalQuestions } =
+  const { question, questionIndex, onNext, score, totalQuestions, bestScore } =
     useQuizContext();
+
+  const { time, start, clear } = useTimer(20);
+
+  useEffect(() => {
+    start();
+    return () => {
+      clear();
+    };
+  }, [question]);
+
+  useEffect(() => {
+    if (time <= 0) {
+      onNext();
+    }
+  }, [time]);
 
   return (
     <SafeAreaView style={styles.page}>
       <View style={styles.container}>
-        <View>
-          <Text style={styles.title}>
-            Question {questionIndex + 1}/{totalQuestions}
-          </Text>
-        </View>
+        {question && (
+          <View>
+            <Text style={styles.title}>
+              Question {questionIndex + 1}/{totalQuestions}
+            </Text>
+          </View>
+        )}
 
         {question ? (
           <View>
             <QuestionCard question={question} />
-            <Text style={styles.time}>20s</Text>
+            <Text style={styles.time} onPress={clear}>
+              {time}s
+            </Text>
           </View>
         ) : (
-          <Card title="Well Done">
-            <Text>
-              Correct answers: {score}/{totalQuestions}
-            </Text>
-            <Text>Best score: 10</Text>
-          </Card>
+          <View style={styles.card}>
+            <Card title="Well Done">
+              <Text>
+                Correct answers: {score}/{totalQuestions}
+              </Text>
+              <Text>Best score: {bestScore}</Text>
+            </Card>
+          </View>
         )}
 
         <CustomButton
@@ -66,6 +88,10 @@ const styles = StyleSheet.create({
     marginTop: 15,
     color: "#005055",
     fontWeight: "bold",
+  },
+  card: {
+    flex: 1,
+    justifyContent: "center",
   },
 });
 
